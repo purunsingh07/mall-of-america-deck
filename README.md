@@ -3,7 +3,7 @@
 A fully interactive, browser-based sales deck for Mall of America — built as a high-end pitch tool for prospective retail tenants, sponsors, and event partners.
 
 ## Live Demo
-[View Live →](https://mall-of-america-deck.vercel.app)
+[View Live →](https://mall-of-america-deck-psi.vercel.app/)
 
 ## Tech Stack
 - React + Vite
