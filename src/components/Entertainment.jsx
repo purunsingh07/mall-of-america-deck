@@ -1,18 +1,7 @@
 // src/components/Entertainment.jsx
-import { useRef, useState, useEffect } from 'react'
-
-function useInView(ref) {
-  const [inView, setInView] = useState(false)
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setInView(true) },
-      { threshold: 0.1 }
-    )
-    if (ref.current) observer.observe(ref.current)
-    return () => observer.disconnect()
-  }, [])
-  return inView
-}
+import { useRef, useState } from 'react'
+import { motion, useInView, useScroll, useTransform } from 'framer-motion'
+import { staggerContainer, staggerChild, fadeUp, lineReveal } from './ScrollAnimations'
 
 const attractions = [
   {
@@ -60,78 +49,124 @@ const attractions = [
 ]
 
 export default function Entertainment() {
-  const ref = useRef(null)
-  const inView = useInView(ref)
+  const sectionRef = useRef(null)
+  const bannerRef = useRef(null)
+  const headerRef = useRef(null)
+  const gridRef = useRef(null)
   const [hovered, setHovered] = useState(null)
 
+  const bannerInView = useInView(bannerRef, { once: true, amount: 0.3 })
+  const headerInView = useInView(headerRef, { once: true, amount: 0.2 })
+  const gridInView = useInView(gridRef, { once: true, amount: 0.1 })
+
+  // Parallax for the banner
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] })
+  const bannerY = useTransform(scrollYProgress, [0, 1], ['0%', '30%'])
+  const accentLineX = useTransform(scrollYProgress, [0, 1], ['100%', '0%'])
+
   return (
-    <section id="entertainment" ref={ref} style={{
+    <section id="entertainment" ref={sectionRef} style={{
       background: '#111114',
       padding: '140px 0',
       position: 'relative', overflow: 'hidden',
     }}>
-        {/* Full-width cinematic banner */}
-<div style={{
-  width: '100%', height: '380px',
-  overflow: 'hidden', position: 'relative',
-}}>
-  <img
-    src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1920&q=80"
-    alt="Entertainment"
-    style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.25 }}
-  />
-  <div style={{
-    position: 'absolute', inset: 0,
-    background: 'linear-gradient(to bottom, #111114 0%, transparent 25%, transparent 75%, #111114 100%)',
-  }} />
-  <div style={{
-    position: 'absolute', inset: 0,
-    display: 'flex', flexDirection: 'column',
-    alignItems: 'center', justifyContent: 'center', gap: '12px',
-  }}>
-    <div style={{
-      fontFamily: 'JetBrains Mono, monospace', fontSize: '11px',
-      letterSpacing: '0.4em', color: '#c9a84c', textTransform: 'uppercase',
-    }}>America's Largest Indoor Theme Park</div>
-    <div style={{
-      fontFamily: 'Playfair Display, serif',
-      fontSize: 'clamp(36px, 5vw, 72px)',
-      fontWeight: 900, color: '#f0ede8', textAlign: 'center',
-    }}>Nickelodeon Universe</div>
-  </div>
-</div>
 
-      {/* BG accent right */}
-      <div style={{
+      {/* Full-width cinematic banner with parallax */}
+      <motion.div
+        ref={bannerRef}
+        initial={{ opacity: 0 }}
+        animate={bannerInView ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 1.2 }}
+        style={{
+          width: '100%', height: '380px',
+          overflow: 'hidden', position: 'relative',
+        }}
+      >
+        <motion.img
+          src="https://images.unsplash.com/photo-1505322022379-7c3353ee6291?w=1920&q=80"
+          alt="Entertainment"
+          style={{
+            width: '100%', height: '140%',
+            objectFit: 'cover', opacity: 0.25,
+            position: 'absolute', top: 0, left: 0,
+            y: bannerY,
+          }}
+        />
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(to bottom, #111114 0%, transparent 25%, transparent 75%, #111114 100%)',
+        }} />
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={bannerInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          style={{
+            position: 'absolute', inset: 0,
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center', gap: '12px',
+          }}
+        >
+          <div style={{
+            fontFamily: 'JetBrains Mono, monospace', fontSize: '11px',
+            letterSpacing: '0.4em', color: '#c9a84c', textTransform: 'uppercase',
+          }}>America's Largest Indoor Theme Park</div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={bannerInView ? { opacity: 1, scale: 1 } : {}}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            style={{
+              fontFamily: 'Playfair Display, serif',
+              fontSize: 'clamp(36px, 5vw, 72px)',
+              fontWeight: 900, color: '#f0ede8', textAlign: 'center',
+            }}
+          >Nickelodeon Universe</motion.div>
+        </motion.div>
+      </motion.div>
+
+      {/* BG accent right — animated */}
+      <motion.div style={{
         position: 'absolute', right: 0, top: 0, bottom: 0, width: '3px',
         background: 'linear-gradient(to bottom, transparent, #c9a84c 30%, #c9a84c 70%, transparent)',
-        opacity: 0.3,
+        opacity: 0.3, x: accentLineX,
       }} />
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 48px', position: 'relative', zIndex: 1 }}>
 
         {/* Header */}
-        <div style={{
-          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px',
-          alignItems: 'end', marginBottom: '80px',
-          opacity: inView ? 1 : 0, transform: inView ? 'translateY(0)' : 'translateY(30px)',
-          transition: 'all 0.8s ease',
-        }}>
-          <div>
-            <div style={{
+        <motion.div
+          ref={headerRef}
+          style={{
+            display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px',
+            alignItems: 'end', marginBottom: '80px',
+          }}
+        >
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate={headerInView ? "visible" : "hidden"}
+          >
+            <motion.div variants={staggerChild} style={{
               fontFamily: 'JetBrains Mono, monospace', fontSize: '11px',
               letterSpacing: '0.35em', textTransform: 'uppercase', color: '#c9a84c', marginBottom: '20px',
-            }}>Attractions & Entertainment</div>
-            <h2 style={{
+            }}>Attractions & Entertainment</motion.div>
+            <motion.h2 variants={staggerChild} style={{
               fontFamily: 'Playfair Display, serif',
               fontSize: 'clamp(36px, 4.5vw, 58px)',
               fontWeight: 700, color: '#f0ede8', lineHeight: 1.1,
             }}>
               Beyond Retail.<br /><em style={{ color: '#c9a84c' }}>A Universe.</em>
-            </h2>
-            <div style={{ width: '48px', height: '1px', background: '#c9a84c', marginTop: '24px' }} />
-          </div>
-          <div>
+            </motion.h2>
+            <motion.div variants={lineReveal} custom={0.3}
+              style={{ width: '48px', height: '1px', background: '#c9a84c', marginTop: '24px', transformOrigin: 'left' }}
+            />
+          </motion.div>
+
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            animate={headerInView ? "visible" : "hidden"}
+            custom={0.2}
+          >
             <p style={{
               fontFamily: 'DM Sans, sans-serif', fontSize: '15px',
               color: '#8a8680', lineHeight: 1.8, marginBottom: '24px',
@@ -146,24 +181,32 @@ export default function Entertainment() {
             }}>
               Avg visit length: <strong>3.4 hours</strong> — 2× national average
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Attraction grid */}
-        <div style={{
-          display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1px',
-          background: 'rgba(201,168,76,0.1)',
-        }}>
+        <motion.div
+          ref={gridRef}
+          variants={staggerContainer}
+          initial="hidden"
+          animate={gridInView ? "visible" : "hidden"}
+          style={{
+            display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1px',
+            background: 'rgba(201,168,76,0.1)',
+          }}
+        >
           {attractions.map((a, i) => (
-            <div key={i}
+            <motion.div key={i}
+              variants={staggerChild}
               onMouseEnter={() => setHovered(i)}
               onMouseLeave={() => setHovered(null)}
+              whileHover={{
+                backgroundColor: 'rgba(201,168,76,0.05)',
+                y: -4,
+              }}
               style={{
-                background: hovered === i ? 'rgba(201,168,76,0.05)' : '#111114',
+                background: '#111114',
                 padding: '40px 32px',
-                opacity: inView ? 1 : 0,
-                transform: inView ? 'translateY(0)' : 'translateY(30px)',
-                transition: `opacity 0.7s ease ${0.05 * i}s, transform 0.7s ease ${0.05 * i}s, background 0.3s`,
                 cursor: 'default',
               }}>
               <div style={{
@@ -173,14 +216,14 @@ export default function Entertainment() {
                   fontFamily: 'JetBrains Mono, monospace', fontSize: '11px',
                   color: '#c9a84c', letterSpacing: '0.2em',
                 }}>{a.number}</div>
-                <div style={{
-                  fontFamily: 'JetBrains Mono, monospace', fontSize: '9px',
-                  color: hovered === i ? '#c9a84c' : '#3a3a3f',
-                  letterSpacing: '0.15em', textTransform: 'uppercase',
-                  padding: '4px 10px', border: '1px solid',
-                  borderColor: hovered === i ? 'rgba(201,168,76,0.3)' : '#3a3a3f',
-                  transition: 'all 0.3s',
-                }}>{a.highlight}</div>
+                <motion.div
+                  animate={{ borderColor: hovered === i ? 'rgba(201,168,76,0.3)' : '#3a3a3f', color: hovered === i ? '#c9a84c' : '#3a3a3f' }}
+                  style={{
+                    fontFamily: 'JetBrains Mono, monospace', fontSize: '9px',
+                    letterSpacing: '0.15em', textTransform: 'uppercase',
+                    padding: '4px 10px', border: '1px solid #3a3a3f',
+                  }}
+                >{a.highlight}</motion.div>
               </div>
 
               <h3 style={{
@@ -195,9 +238,9 @@ export default function Entertainment() {
                 fontFamily: 'DM Sans, sans-serif', fontSize: '13px',
                 color: '#8a8680', lineHeight: 1.75,
               }}>{a.desc}</p>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
       </div>
     </section>
