@@ -1,16 +1,42 @@
-# React + Vite
+# Mall of America — Interactive Sales Deck
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A fully interactive, browser-based sales deck for Mall of America — built as a high-end pitch tool for prospective retail tenants, sponsors, and event partners.
 
-Currently, two official plugins are available:
+## Live Demo
+[View Live →](https://mall-of-america-deck.vercel.app)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Tech Stack
+- React + Vite
+- Tailwind CSS
+- Framer Motion (scroll animations)
+- Google Fonts (Playfair Display, DM Sans, JetBrains Mono)
+- Deployed via Vercel
 
-## React Compiler
+## Features
+- Cinematic hero with animated stat counters
+- Scroll-triggered section reveals
+- Tabbed retail leasing explorer
+- Interactive event type selector
+- Contact form with path-based inquiry routing
+- Non-linear navigation across all 7 sections
+- Fully responsive (desktop + tablet)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Setup
+```bash
+npm install
+npm run dev
+```
+
+## Build
+```bash
+npm run build
+```
+
+## Design Decisions
+- Obsidian/gold palette inspired by luxury fashion brands
+- Playfair Display for editorial gravitas
+- JetBrains Mono for data/labels — creates editorial tension
+- All animations CSS + IntersectionObserver — no heavy libraries
+- Modular component architecture — each section is independently expandable
